@@ -1,0 +1,125 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        { "label": "clear", "command": "rundll32", "presentation":{
+            "echo": false,
+            "reveal": "never",
+            "focus": false,
+            "panel": "shared",
+            "showReuseMessage": false,
+            "clear": true
+        } },
+        {
+            "label": "build",
+            "command": "cargo",
+            "args": ["build"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+            ],
+            "group": "build",
+            "presentation": {
+                "panel": "shared",
+                "focus": true,
+                "clear": true
+            }
+        },
+        {
+            "label": "build release",
+            "command": "cargo",
+            "args": ["build", "--release"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+            ],
+            "group": "build",
+            "presentation": {
+                "panel": "shared",
+                "focus": true,
+                "clear": true
+            }
+        },
+        {
+            "label": "run tests",
+            "command": "cargo",
+            "args": ["test", "--quiet"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+            ],
+            "group": "build",
+            "presentation": {
+                "panel": "shared",
+                "focus": true,
+                "clear": true
+            }
+        },
+        {
+            "label": "clean",
+            "command": "cargo",
+            "args": ["clean", "--package", "adventofcode2020"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+            ],
+            "group": "build",
+            "presentation": {
+                "panel": "shared",
+                "focus": true,
+                "clear": true
+            }
+        },
+        {
+            "label": "format",
+            "command": "cargo",
+            "args": ["fmt"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+            ],
+            "group": "build",
+            "presentation": {
+                "panel": "shared",
+                "focus": true,
+                "clear": true
+            }
+        },
+        {
+            "label": "lint",
+            "type": "shell",
+            "command": "cargo clean --package adventofcode2020 ; cargo clippy",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+            ],
+            "group": "build",
+            "presentation": {
+                "panel": "shared",
+                "focus": true,
+                "clear": true
+            }
+        },
+        {
+            "label": "fmt+lint+test",
+            "type": "shell",
+            "command": "cargo fmt --package adventofcode2020 ; cargo clean --package adventofcode2020 ; cargo clippy ; cargo test",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+            ],
+            "group": "build",
+            "presentation": {
+                "panel": "shared",
+                "focus": true,
+                "clear": true
+            }
+        }
+    ]
+}
