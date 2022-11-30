@@ -43,8 +43,8 @@
         },
         {
             "label": "run tests",
-            "command": "cargo",
-            "args": ["test", "--quiet"],
+            "command": "py",
+            "args": ["src/runtests.py"],
             "options": {
                 "cwd": "${workspaceFolder}"
             },
@@ -60,7 +60,7 @@
         {
             "label": "clean",
             "command": "cargo",
-            "args": ["clean", "--package", "adventofcode2020"],
+            "args": ["clean", "--package", "aoc2022"],
             "options": {
                 "cwd": "${workspaceFolder}"
             },
@@ -92,7 +92,7 @@
         {
             "label": "lint",
             "type": "shell",
-            "command": "cargo clean --package adventofcode2020 ; cargo clippy",
+            "command": "cargo clean --package aoc2022 ; cargo clippy",
             "options": {
                 "cwd": "${workspaceFolder}"
             },
@@ -108,7 +108,7 @@
         {
             "label": "fmt+lint+test",
             "type": "shell",
-            "command": "cargo fmt --package adventofcode2020 ; cargo clean --package adventofcode2020 ; cargo clippy ; cargo test",
+            "command": "cargo fmt --package aoc2022 ; cargo clean --package aoc2022 ; cargo clippy ; py src/runtests.py",
             "options": {
                 "cwd": "${workspaceFolder}"
             },

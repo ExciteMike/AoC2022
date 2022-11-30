@@ -15,4 +15,3 @@ except FileNotFoundError:
     urllib.request.install_opener(opener)
     urllib.request.urlretrieve(url, fname)
     f = open(fname, "r")
-print(f.read().strip())
