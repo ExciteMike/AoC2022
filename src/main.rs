@@ -76,95 +76,91 @@ fn do_test<T: std::fmt::Display, U: std::fmt::Display>(day: usize, p1: T, p2: U)
 }
 #[test]
 fn day01() {
-    do_test(1, 997899, 131248694);
+    do_test(1, 69310, 206104);
 }
 #[test]
 fn day02() {
-    do_test(2, 465, 294);
+    do_test(2, 0, 0);
 }
 #[test]
 fn day03() {
-    do_test(3, 207, 2655892800usize);
+    do_test(3, 0, 0);
 }
 #[test]
 fn day04() {
-    do_test(4, 196, 114);
+    do_test(4, 0, 0);
 }
 #[test]
 fn day05() {
-    do_test(5, 930, 515);
+    do_test(5, 0, 0);
 }
 #[test]
 fn day06() {
-    do_test(6, 6683, 3122);
+    do_test(6, 0, 0);
 }
 #[test]
 fn day07() {
-    do_test(7, 229, 6683);
+    do_test(7, 0, 0);
 }
 #[test]
 fn day08() {
-    do_test(8, 1394, 1626);
+    do_test(8, 0, 0);
 }
 #[test]
 fn day09() {
-    do_test(9, 50047984, 5407707);
+    do_test(9, 0, 0);
 }
 #[test]
 fn day10() {
-    do_test(10, 1885, 2024782584832usize);
+    do_test(10, 0, 0);
 }
 #[test]
 fn day11() {
-    do_test(11, 2359, 2131);
+    do_test(11, 0, 0);
 }
 #[test]
 fn day12() {
-    do_test(12, 757, 51249);
+    do_test(12, 0, 0);
 }
 #[test]
 fn day13() {
-    do_test(13, 205, 803025030761664u64);
+    do_test(13, 0, 0);
 }
 #[test]
 fn day14() {
-    do_test(14, 11327140210986u64, 2308180581795u64);
+    do_test(14, 0, 0);
 }
 #[test]
 fn day15() {
-    do_test(15, 981, 164878);
+    do_test(15, 0, 0);
 }
 #[test]
 fn day16() {
-    do_test(16, 25059, 3253972369789u64);
+    do_test(16, 0, 0);
 }
 #[test]
 fn day17() {
-    do_test(17, 271, 2064);
+    do_test(17, 0, 0);
 }
 #[test]
 fn day18() {
-    do_test(18, 23507031841020u64, 218621700997826u64);
+    do_test(18, 0, 0);
 }
 #[test]
 fn day19() {
-    do_test(19, 147, 263);
+    do_test(19, 0, 0);
 }
 #[test]
 fn day20() {
-    do_test(20, 14129524957217u64, 1649);
+    do_test(20, 0, 0);
 }
 #[test]
 fn day21() {
-    do_test(
-        21,
-        2020,
-        "bcdgf,xhrdsl,vndrb,dhbxtb,lbnmsr,scxxn,bvcrrfbr,xcgtv",
-    );
+    do_test(21, 0, 0);
 }
 #[test]
 fn day22() {
-    do_test(22, 32366, 30891);
+    do_test(22, 0, 0);
 }
 #[test]
 fn day23() {

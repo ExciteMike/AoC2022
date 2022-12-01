@@ -1,8 +1,9 @@
 #![allow(unused_imports)]
 use itertools::Itertools;
+use shared::puzzle_input;
 
 pub fn main() {
-    let input = shared::puzzle_input!();
+    let input = puzzle_input!();
     let _parsed_input = input
         .split('\n')
         .map(|line| {
