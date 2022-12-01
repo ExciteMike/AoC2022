@@ -2,7 +2,9 @@ use itertools::Itertools;
 use shared::puzzle_input;
 
 fn elf_sum(elf: &str) -> usize {
-    elf.split('\n').map(|s| s.parse::<usize>().unwrap()).sum()
+    elf.split('\n')
+        .map(|s| s.trim().parse::<usize>().unwrap())
+        .sum()
 }
 pub fn main() {
     let sorted_totals = puzzle_input!()
