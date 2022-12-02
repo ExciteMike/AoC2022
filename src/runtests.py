@@ -1,9 +1,11 @@
 from datetime import date
 from subprocess import run
+import sys
 
 year = 2022
 today = date.today()
-for i in range (1,32):
-    if today >= date.fromisoformat(f"{year}-12-{i:02d}"):
-        run(f'cargo test day{i:02d} --bin aoc{year} --quiet')
+days = [int(x) for x in sys.argv[1:]] if len(sys.argv) > 1 else range(1,26)
+for day in days:
+    if today >= date.fromisoformat(f"{year}-12-{day:02d}"):
+        run(f'cargo test day{day:02d} --bin aoc{year} --quiet')
 print('done')

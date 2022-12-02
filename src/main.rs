@@ -43,7 +43,8 @@ fn do_day_rust(chosen_day: usize) -> String {
 #[cfg(test)]
 fn do_day_python(chosen_day: usize) -> String {
     let output = Command::new("python")
-        .arg(format!("src/day{:02}/main.py", chosen_day))
+        .arg("src/main.py")
+        .arg(format!("{}", chosen_day))
         .output()
         .expect("error running process");
     if !output.stderr.is_empty() {

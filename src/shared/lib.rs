@@ -28,7 +28,8 @@ macro_rules! puzzle_input {
         let day_num = (&mod_name[3..5])
             .parse::<u32>()
             .expect(&format!("something went wrong parsing \"{}\"", mod_name));
-        shared::puzzle_input(year, day_num)
+        let x = shared::puzzle_input(year, day_num).replace("\r\n", "\n");
+        x.trim().to_string()
     }};
 }
 
