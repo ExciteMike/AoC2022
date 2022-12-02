@@ -80,7 +80,7 @@ fn day01() {
 }
 #[test]
 fn day02() {
-    do_test(2, 0, 0);
+    do_test(2, 9651, 10560);
 }
 #[test]
 fn day03() {
