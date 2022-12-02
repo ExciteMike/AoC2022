@@ -32,7 +32,7 @@ fn score_p2(line: &str) -> usize {
 
 pub fn main() {
     let input = puzzle_input!();
-    let rounds = input.trim().split('\n');
+    let rounds = input.split('\n');
     let p1: usize = rounds.clone().map(score_p1).sum();
     let p2: usize = rounds.map(score_p2).sum();
     println!("part 1: {}\npart 2: {}", p1, p2);
