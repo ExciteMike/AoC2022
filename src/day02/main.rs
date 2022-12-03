@@ -1,3 +1,4 @@
+#![allow(clippy::identity_op)]
 use shared::puzzle_input;
 
 fn score_p1(line: &str) -> usize {
