@@ -56,6 +56,20 @@ fn do_day_python(chosen_day: usize) -> String {
         .to_string()
 }
 #[cfg(test)]
+fn do_day_elixir(chosen_day: usize) -> String {
+    let output = Command::new("elixir.bat")
+        .arg(format!("src/day{:02}/main.exs", chosen_day))
+        .output()
+        .expect("error running process");
+    if !output.stderr.is_empty() {
+        eprintln!("{}", std::str::from_utf8(&output.stderr).unwrap())
+    }
+    std::str::from_utf8(&output.stdout)
+        .unwrap()
+        .replace("\r\n", "\n")
+        .to_string()
+}
+#[cfg(test)]
 #[track_caller]
 fn do_test<T: std::fmt::Display, U: std::fmt::Display>(day: usize, p1: T, p2: U) {
     if std::path::Path::new(&format!("src/day{:02}/main.rs", day)).exists() {
@@ -71,6 +85,14 @@ fn do_test<T: std::fmt::Display, U: std::fmt::Display>(day: usize, p1: T, p2: U)
             do_day_python(day),
             format!("part 1: {}\npart 2: {}\n", p1, p2),
             "Python solution failed for day {}",
+            day
+        );
+    }
+    if std::path::Path::new(&format!("src/day{:02}/main.exs", day)).exists() {
+        assert_eq!(
+            do_day_elixir(day),
+            format!("part 1: {}\npart 2: {}\n", p1, p2),
+            "Elixir solution failed for day {}",
             day
         );
     }
