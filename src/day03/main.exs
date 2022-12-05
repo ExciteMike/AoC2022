@@ -32,7 +32,7 @@ end
 elves =
   File.read!("puzzle_input/day03")
   |> String.trim()
-  |> String.split("\n", trim: True)
+  |> String.split(~r/\R/, trim: True)
   |> Enum.map(fn x -> Enum.map(String.graphemes(x), &Day03.priority/1) end)
 
 p1 =

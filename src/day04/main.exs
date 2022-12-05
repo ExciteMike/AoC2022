@@ -1,7 +1,7 @@
 lines =
   File.read!("puzzle_input/day04")
   |> String.trim()
-  |> String.split("\n", trim: True)
+  |> String.split(~r/\R/, trim: True)
 
 ranges =
   for line <- lines do
