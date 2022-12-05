@@ -1,4 +1,3 @@
-#![allow(unused_imports)]
 use itertools::Itertools;
 use shared::puzzle_input;
 

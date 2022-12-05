@@ -21,6 +21,17 @@ macro_rules! words {
 }
 
 #[macro_export]
+macro_rules! map_words {
+    ($input:expr, $f:expr, $($i:expr),+) => {{
+        use unicode_segmentation::UnicodeSegmentation;
+        let words: Vec<_> = $input.unicode_words().filter(|s| !s.trim().is_empty()).collect();
+        (
+            $($f(words[$i])),+
+        )
+    }}
+}
+
+#[macro_export]
 macro_rules! puzzle_input {
     () => {{
         const year: i32 = 2022;
@@ -29,7 +40,7 @@ macro_rules! puzzle_input {
             .parse::<u32>()
             .expect(&format!("something went wrong parsing \"{}\"", mod_name));
         let x = shared::puzzle_input(year, day_num).replace("\r\n", "\n");
-        x.trim().to_string()
+        x.trim_end().to_string()
     }};
 }
 

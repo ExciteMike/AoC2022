@@ -8,7 +8,7 @@ use std::{
 type Elf = (RangeInclusive<usize>, RangeInclusive<usize>);
 
 fn read_elf(line: &str) -> Elf {
-    line.split(",")
+    line.split(',')
         .map(|s| {
             let mut i = s.split('-').map(|s| s.parse::<usize>().unwrap());
             i.next().unwrap()..=i.next().unwrap()

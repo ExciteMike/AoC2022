@@ -115,7 +115,7 @@ fn day04() {
 }
 #[test]
 fn day05() {
-    do_test(5, 0, 0);
+    do_test(5, "CFFHVVHNC", "FSZWBPTBG");
 }
 #[test]
 fn day06() {
