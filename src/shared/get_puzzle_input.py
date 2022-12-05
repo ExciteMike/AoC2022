@@ -14,4 +14,4 @@ def puzzle_input(day):
         urllib.request.install_opener(opener)
         urllib.request.urlretrieve(url, fname)
         f = open(fname, "r")
-    return f.read().strip()
+    return f.read().rstrip()
