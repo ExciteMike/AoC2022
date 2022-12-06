@@ -1,3 +1,6 @@
 /target
 session_cookie
 __pycache__
+*.o
+*.exe
+*.hi
