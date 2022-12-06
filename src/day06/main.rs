@@ -1,19 +1,27 @@
+use std::{collections::HashSet, iter::FromIterator};
+
 use itertools::Itertools;
 use shared::puzzle_input;
 
+fn detect(input: &str, marker_len: usize) -> usize {
+    input
+        .chars()
+        .collect_vec()
+        .windows(marker_len)
+        .enumerate()
+        .find_map(|(i, x)| {
+            if HashSet::<&char>::from_iter(x).len() == marker_len {
+                Some(i)
+            } else {
+                None
+            }
+        })
+        .unwrap()
+        + marker_len
+}
+
 pub fn main() {
     let input = puzzle_input!();
-    let _parsed_input = input
-        .split('\n')
-        .map(|line| {
-            line.chars().fold(
-                0u32,
-                |acc, c| if c == '#' { (acc << 1) | 1 } else { acc << 1 },
-            )
-        })
-        .collect_vec();
-    let p1 = 0;
-    let p2 = 0;
-
-    println!("part 1: {}\npart 2: {}", p1, p2);
+    println!("part 1: {}", detect(&input, 4));
+    println!("part 2: {}", detect(&input, 14));
 }

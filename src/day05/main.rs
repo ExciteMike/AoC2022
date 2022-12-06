@@ -22,7 +22,7 @@ fn run(stacks: &mut [String], code: &str, reverse: bool) -> String {
         if reverse {
             to_v.extend(to_move.chars().rev());
         } else {
-            to_v.extend(to_move.chars());
+            to_v.push_str(&to_move);
         }
     }
     stacks
