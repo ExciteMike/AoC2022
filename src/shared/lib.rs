@@ -77,3 +77,93 @@ pub fn puzzle_input(year: i32, day_num: u32) -> String {
     }
     std::fs::read_to_string(&input_path).expect("error opening puzzle input")
 }
+
+pub mod string_windows {
+    use std::num::NonZeroUsize;
+
+    #[inline]
+    fn ceil_char_boundary(s: &str, index: usize) -> usize {
+        assert!(index <= s.len());
+
+        let upper_bound = Ord::min(index + 4, s.len());
+        s.as_bytes()[index..upper_bound]
+            .iter()
+            .position(|b| (*b as i8) >= -0x40)
+            .map_or(upper_bound, |pos| pos + index)
+    }
+
+    pub trait Windows<'a> {
+        fn windows(&'a self, size: usize) -> StringWindows<'a>;
+    }
+
+    pub enum StringWindows<'a> {
+        Done,
+        InProgress {
+            begin: usize,
+            end: usize,
+            src: &'a str,
+        },
+    }
+
+    impl<'a> StringWindows<'a> {
+        #[inline]
+        pub fn new(src: &'a str, size: NonZeroUsize) -> Self {
+            if src.len() < size.into() {
+                return Self::Done;
+            }
+            let end = src
+                .char_indices()
+                .nth(size.into())
+                .unwrap_or((src.len(), ' '))
+                .0;
+            Self::InProgress { begin: 0, end, src }
+        }
+    }
+
+    impl<'a> Iterator for StringWindows<'a> {
+        type Item = &'a str;
+
+        #[inline]
+        fn next(&mut self) -> Option<Self::Item> {
+            match self {
+                Self::Done => None,
+                Self::InProgress { begin, end, src } => {
+                    let s = &src[*begin..*end];
+                    if *end < src.len() {
+                        *begin = ceil_char_boundary(src, *begin + 1);
+                        *end = ceil_char_boundary(src, *end + 1);
+                    } else {
+                        *self = Self::Done;
+                    }
+                    Some(s)
+                }
+            }
+        }
+
+        #[inline]
+        fn size_hint(&self) -> (usize, Option<usize>) {
+            match self {
+                Self::Done => (0, Some(0)),
+                Self::InProgress { end, src, .. } => {
+                    let n = src.len() - end + 1;
+                    (n, Some(n))
+                }
+            }
+        }
+
+        #[inline]
+        fn count(self) -> usize {
+            match self {
+                Self::Done => 0,
+                Self::InProgress { end, src, .. } => src.len() - end + 1,
+            }
+        }
+    }
+
+    impl<'a> Windows<'a> for &'a str {
+        fn windows(&'a self, size: usize) -> StringWindows {
+            let size = NonZeroUsize::new(size).expect("Attempted to take windows of size zero");
+            StringWindows::<'a>::new(self, size)
+        }
+    }
+}
