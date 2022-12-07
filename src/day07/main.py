@@ -25,7 +25,6 @@ $ ls
 7214296 k
 """
 
-CMD = re.compile('\$')
 UP = re.compile('\$ cd \.\.')
 TOP = re.compile('\$ cd /')
 DOWN = re.compile('\$ cd (.*)')
@@ -50,7 +49,6 @@ def parents_of(path):
 def main(input):
     curpath = '/'
     dirs = {'/': 0}
-    files = []
     for line in input.splitlines():
         if LS.match(line):
             continue
@@ -84,7 +82,6 @@ def main(input):
         if m:
             size = int(m.group(1))
             path = f'{curpath.rstrip("/")}/{m.group(2)}'
-            files.append((path, size))
             for parent in parents_of(path):
                 dirs[parent] += size
             continue
