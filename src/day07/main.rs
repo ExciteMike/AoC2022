@@ -25,7 +25,7 @@ pub fn main() {
                 path.push(s);
                 sizes.insert(path, 0);
             }
-            [s, _] if s.chars().all(|c| c.is_digit(10)) => {
+            [s, _] if s.chars().all(|c| c.is_ascii_digit()) => {
                 let file_size: usize = s.parse().unwrap();
                 let mut path = cd.clone();
                 while !path.is_empty() {
