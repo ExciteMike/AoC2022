@@ -1,23 +1,14 @@
-use std::{collections::HashSet, iter::FromIterator};
-
 use itertools::Itertools;
 use shared::puzzle_input;
+use shared::string_windows::*;
 
 fn detect(input: &str, marker_len: usize) -> usize {
-    input
-        .chars()
-        .collect_vec()
-        .windows(marker_len)
-        .enumerate()
-        .find_map(|(i, x)| {
-            if HashSet::<&char>::from_iter(x).len() == marker_len {
-                Some(i)
-            } else {
-                None
-            }
-        })
-        .unwrap()
-        + marker_len
+    for (i, s) in input.windows(marker_len).enumerate() {
+        if s.chars().counts().len() == marker_len {
+            return i + marker_len;
+        }
+    }
+    0
 }
 
 pub fn main() {
