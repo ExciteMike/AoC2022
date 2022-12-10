@@ -72,10 +72,11 @@ fn do_day_elixir(chosen_day: usize) -> String {
 #[cfg(test)]
 #[track_caller]
 fn do_test<T: std::fmt::Display, U: std::fmt::Display>(day: usize, p1: T, p2: U) {
+    let expected = format!("part 1: {}\npart 2: {}\n", p1, p2);
     if std::path::Path::new(&format!("src/day{:02}/main.rs", day)).exists() {
         assert_eq!(
             do_day_rust(day),
-            format!("part 1: {}\npart 2: {}\n", p1, p2),
+            expected,
             "Rust solution failed for day {}",
             day
         );
@@ -83,7 +84,7 @@ fn do_test<T: std::fmt::Display, U: std::fmt::Display>(day: usize, p1: T, p2: U)
     if std::path::Path::new(&format!("src/day{:02}/main.py", day)).exists() {
         assert_eq!(
             do_day_python(day),
-            format!("part 1: {}\npart 2: {}\n", p1, p2),
+            expected,
             "Python solution failed for day {}",
             day
         );
@@ -91,7 +92,7 @@ fn do_test<T: std::fmt::Display, U: std::fmt::Display>(day: usize, p1: T, p2: U)
     if std::path::Path::new(&format!("src/day{:02}/main.exs", day)).exists() {
         assert_eq!(
             do_day_elixir(day),
-            format!("part 1: {}\npart 2: {}\n", p1, p2),
+            expected,
             "Elixir solution failed for day {}",
             day
         );
@@ -135,7 +136,14 @@ fn day09() {
 }
 #[test]
 fn day10() {
-    do_test(10, 0, 0);
+    const DAY10P2: &str = "
+  [][][][]  [][][]      [][]    [][][]    []    []  [][][][]    [][]    []    []
+  []        []    []  []    []  []    []  []    []  []        []    []  []    []
+  [][][]    []    []  []        []    []  [][][][]  [][][]    []        [][][][]
+  []        [][][]    []  [][]  [][][]    []    []  []        []  [][]  []    []
+  []        []        []    []  []        []    []  []        []    []  []    []
+  []        []          [][][]  []        []    []  []          [][][]  []    []";
+    do_test(10, 10760, DAY10P2);
 }
 #[test]
 fn day11() {
