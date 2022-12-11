@@ -58,7 +58,6 @@ defmodule Day11 do
         end
     end
     |> Enum.map(fn {_, m} -> m.count end)
-    |> Enum.concat([0])
     |> Enum.sort()
     |> Enum.reverse()
     |> Enum.take(2)
@@ -105,5 +104,5 @@ ms =
   |> Stream.with_index()
   |> Map.new(fn {v, i} -> {i, v} end)
 
-IO.puts("part 1: #{Day11.play(ms, 20, True)}")
-IO.puts("part 2: #{Day11.play(ms, 10000, False)}")
+IO.puts("part 1: #{Day11.play(ms, 20, true)}")
+IO.puts("part 2: #{Day11.play(ms, 10000, false)}")
