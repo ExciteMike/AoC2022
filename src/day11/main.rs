@@ -1,5 +1,3 @@
-use std::mem::swap;
-
 use itertools::Itertools;
 use shared::puzzle_input;
 
@@ -49,10 +47,7 @@ fn parse_monkey(s: &str) -> Monkey {
 }
 
 fn run_turn(m: &mut Monkey, div3: bool) -> Vec<(usize, usize)> {
-    let mut items: Vec<usize> = vec![];
-    swap(&mut m.items, &mut items);
-    m.count += items.len();
-    items
+    let throws = m.items
         .iter()
         .map(|x| {
             let x = match m.op {
@@ -69,15 +64,17 @@ fn run_turn(m: &mut Monkey, div3: bool) -> Vec<(usize, usize)> {
             };
             (dst, x)
         })
-        .collect_vec()
+        .collect_vec();
+    m.count += m.items.len();
+    m.items.clear();
+    throws
 }
 
 fn run_game(input: &str, rounds: usize, div3: bool) -> usize {
     let mut ms = input.split("\n\n").map(parse_monkey).collect_vec();
     for _round in 0..rounds {
         for i in 0..ms.len() {
-            let throws = run_turn(&mut ms[i], div3);
-            for (dst, x) in throws {
+            for (dst, x) in run_turn(&mut ms[i], div3) {
                 ms[dst].items.push(x);
             }
         }

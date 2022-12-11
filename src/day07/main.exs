@@ -22,11 +22,11 @@ defmodule Day07 do
     end
   end
 
-  def updateSizes(path, bytes, sizes) do
+  def update_sizes(path, bytes, sizes) do
     if Enum.empty?(path) do
       Map.update!(sizes, path, &(&1 + bytes))
     else
-      updateSizes(tl(path), bytes, Map.update!(sizes, path, &(&1 + bytes)))
+      update_sizes(tl(path), bytes, Map.update!(sizes, path, &(&1 + bytes)))
     end
   end
 end
@@ -44,11 +44,11 @@ p1 =
 
 IO.puts("part 1: #{p1}")
 
-toFree = 30_000_000 - 70_000_000 + Map.get(data, [])
+to_free = 30_000_000 - 70_000_000 + Map.get(data, [])
 
 p2 =
   Map.values(data)
-  |> Enum.filter(&(&1 >= toFree))
+  |> Enum.filter(&(&1 >= to_free))
   |> Enum.min()
 
 IO.puts("part 2: #{p2}")
