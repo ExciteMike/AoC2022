@@ -47,7 +47,8 @@ fn parse_monkey(s: &str) -> Monkey {
 }
 
 fn run_turn(m: &mut Monkey, div3: bool) -> Vec<(usize, usize)> {
-    let throws = m.items
+    let throws = m
+        .items
         .iter()
         .map(|x| {
             let x = match m.op {
