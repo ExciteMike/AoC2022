@@ -18,7 +18,7 @@ defmodule Day07 do
 
       [s, _] ->
         {bytes, _} = Integer.parse(s)
-        {cd, Day07.updateSizes(cd, bytes, sizes)}
+        {cd, Day07.update_sizes(cd, bytes, sizes)}
     end
   end
 
