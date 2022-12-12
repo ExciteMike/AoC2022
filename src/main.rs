@@ -74,6 +74,7 @@ fn do_day_elixir(chosen_day: usize) -> String {
 fn do_test<T: std::fmt::Display, U: std::fmt::Display>(day: usize, p1: T, p2: U) {
     let expected = format!("part 1: {}\npart 2: {}\n", p1, p2);
     if std::path::Path::new(&format!("src/day{:02}/main.rs", day)).exists() {
+        println!("Testing Rust solution");
         assert_eq!(
             do_day_rust(day),
             expected,
@@ -82,6 +83,7 @@ fn do_test<T: std::fmt::Display, U: std::fmt::Display>(day: usize, p1: T, p2: U)
         );
     }
     if std::path::Path::new(&format!("src/day{:02}/main.py", day)).exists() {
+        println!("Testing Python solution");
         assert_eq!(
             do_day_python(day),
             expected,
@@ -90,6 +92,7 @@ fn do_test<T: std::fmt::Display, U: std::fmt::Display>(day: usize, p1: T, p2: U)
         );
     }
     if std::path::Path::new(&format!("src/day{:02}/main.exs", day)).exists() {
+        println!("Testing Elixir solution");
         assert_eq!(
             do_day_elixir(day),
             expected,
@@ -151,7 +154,7 @@ fn day11() {
 }
 #[test]
 fn day12() {
-    do_test(12, 0, 0);
+    do_test(12, 447, 446);
 }
 #[test]
 fn day13() {
