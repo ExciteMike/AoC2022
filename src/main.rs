@@ -1,25 +1,28 @@
 #![warn(clippy::all)]
-use std::io::BufRead;
+use chrono::{NaiveDate, Utc};
+use std::cmp::min;
 use std::process::Command;
+use std::{cmp::max, io::BufRead};
+
+const YEAR: usize = 2022;
 
 fn main() -> std::io::Result<()> {
     let stdin = std::io::stdin();
     let mut stdin_lines = stdin.lock().lines();
-    let days = (1..=25)
-        .filter(|day| std::fs::metadata(format!("src/day{:02}/main.rs", day)).is_ok())
-        .collect::<Vec<usize>>();
-    println!(
-        "Enter a day number (1-{} inclusive) or just press enter for default",
-        days.len()
+    let now = Utc::now().date_naive();
+    let start_of_month = NaiveDate::parse_from_str(&format!("{}-12-01", YEAR), "%Y-%m-%d").unwrap();
+    let default_day = max(
+        0,
+        min(25, now.signed_duration_since(start_of_month).num_days() + 1),
     );
-    let chosen_day = if let Some(Ok(day)) = stdin_lines.next() {
-        if let Ok(day) = day.parse::<usize>() {
-            day
-        } else {
-            *days.last().unwrap()
-        }
+    println!(
+        "Enter a day number (1-25) or just press enter for default ({})",
+        default_day,
+    );
+    let chosen_day = if let Ok(day) = stdin_lines.next().unwrap()?.parse::<i64>() {
+        day
     } else {
-        *days.last().unwrap()
+        default_day
     };
     println!("{}", do_day_rust(chosen_day));
     println!("Press enter to quit");
@@ -27,7 +30,7 @@ fn main() -> std::io::Result<()> {
     Ok(())
 }
 
-fn do_day_rust(chosen_day: usize) -> String {
+fn do_day_rust<T: std::fmt::Display>(chosen_day: T) -> String {
     let output = Command::new("cargo")
         .arg("run")
         .arg("--bin")
@@ -158,7 +161,7 @@ fn day12() {
 }
 #[test]
 fn day13() {
-    do_test(13, 0, 0);
+    do_test(13, 5588, 23958);
 }
 #[test]
 fn day14() {

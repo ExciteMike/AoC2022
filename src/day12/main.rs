@@ -1,4 +1,4 @@
-use std::collections::{VecDeque};
+use std::collections::VecDeque;
 
 use itertools::Itertools;
 use shared::puzzle_input;
