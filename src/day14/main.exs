@@ -27,6 +27,25 @@ defmodule Day14 do
     end
   end
 
+  def debug_draw(m) do
+    {{_, lowbound}, _} = Enum.max(m, fn {{_, y1}, _}, {{_, y2}, _} -> y1 >= y2 end)
+    {leftbound, rightbound} =
+      Enum.map(Map.keys(m), fn {x, _} -> x end)
+      |> Enum.min_max()
+    for y <- 0..lowbound do
+      for x <- leftbound..rightbound do
+        case Map.get(m, {x, y}) do
+          nil -> "  "
+          :rock -> "%%"
+          :sand -> "::"
+        end
+        |> IO.write()
+      end
+
+      IO.puts("")
+    end
+  end
+
   def play(blocked, endcond, endy, count \\ 0) do
     case drop_sand(blocked, endcond, endy) do
       nil ->
@@ -76,8 +95,13 @@ blocked =
 
 {{_, lowest}, _} = Enum.max(blocked, fn {{_, y1}, _}, {{_, y2}, _} -> y1 >= y2 end)
 
-{blocked, p1} = Day14.play(blocked, :void, lowest + 1)
-{_, p2} = Day14.play(blocked, :floor, lowest + 12)
+{blocked, p1} = Day14.play(blocked, :void, lowest)
+
+# Day14.debug_draw(blocked)
+
+{_, p2} = Day14.play(blocked, :floor, lowest + 1)
+
+# Day14.debug_draw(blocked)
 
 # 913, 30762
-IO.puts("part 1: #{p1}\npart 2: #{p2}")
+IO.puts("part 1: #{p1}\npart 2: #{p1 + p2}")
