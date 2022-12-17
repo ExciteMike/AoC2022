@@ -25,8 +25,13 @@ const P1PACE: [u16; 30] = [
     1100, 1200, 1300, 1500, 1600, 1700, 1800, 2000, 2000,
 ];
 const P2PACE: [u16; 30] = [
-    0, 0, 0, 1, 10, 50, 100, 150, 200, 300, 400, 500, 600, 700, 850, 1000, 1150, 1300, 1500, 1650, 1850, 2000, 2200, 2400, 2600, 2800, 0, 0, 0, 0,
+    0, 0, 0, 1, 10, 50, 100, 150, 200, 300, 400, 500, 600, 700, 850, 1000, 1150, 1300, 1500, 1650,
+    1850, 2000, 2200, 2400, 2600, 2800, 0, 0, 0, 0,
 ];
+
+type Names<'a> = Box<[&'a str]>;
+type Rates = Box<[u8]>;
+type Edges = Box<[Box<[u8]>]>;
 
 struct StackItem<const WORKERS: usize> {
     workers: [u8; WORKERS],
@@ -42,13 +47,7 @@ enum Action {
     Move(usize, u8),
 }
 
-fn moves(
-    worker: usize,
-    cur_valve: u8,
-    closed: u64,
-    rates: &[u8],
-    edges: &[Box<[u8]>],
-) -> Vec<Action> {
+fn moves(worker: usize, cur_valve: u8, closed: u64, rates: &[u8], edges: &Edges) -> Vec<Action> {
     let mut v = vec![];
     let mask = 0x1 << cur_valve;
     let valve_flow = rates[cur_valve as usize];
@@ -62,9 +61,9 @@ fn moves(
 }
 
 fn play<const WORKERS: usize, const TIME: u8>(
-    names: &[&'_ str],
-    rates: &[u8],
-    edges: &[Box<[u8]>],
+    names: &Names,
+    rates: &Rates,
+    edges: &Edges,
     pace: &[u16; 30],
 ) -> u16 {
     let aa = names.iter().position(|&x| x == "AA").unwrap() as u8;
@@ -107,7 +106,7 @@ fn play<const WORKERS: usize, const TIME: u8>(
                     Action::Open(valve) => {
                         if 0 != (closed & (0x1 << valve)) {
                             flow += rates[valve as usize] as u16;
-                            closed = closed & !(0x1 << valve);
+                            closed &= !(0x1 << valve);
                         }
                     }
                     Action::Move(w, v) => {
@@ -124,10 +123,10 @@ fn play<const WORKERS: usize, const TIME: u8>(
             });
         }
     }
-    return best;
+    best
 }
 
-fn parse(input: &str) -> (Box<[&'_ str]>, Box<[u8]>, Box<[Box<[u8]>]>) {
+fn parse(input: &str) -> (Names<'_>, Rates, Edges) {
     let mut names = Vec::with_capacity(59);
     let mut rates = Vec::with_capacity(59);
     let mut edges = Vec::with_capacity(59);
