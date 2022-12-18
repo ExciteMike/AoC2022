@@ -177,7 +177,7 @@ fn day16() {
 }
 #[test]
 fn day17() {
-    do_test(17, 0, 0);
+    do_test(17, 3098, 1525364431487u64);
 }
 #[test]
 fn day18() {

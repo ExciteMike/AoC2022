@@ -1,7 +1,7 @@
+use std::collections::HashMap;
+
 use itertools::Itertools;
 use shared::puzzle_input;
-
-const EXAMPLE: &str = ">>><<><>><<<>><>>><<<>>><<<><<<>><>><<>>";
 
 const ROCKSDEF: &str = "####
 
@@ -20,12 +20,10 @@ const ROCKSDEF: &str = "####
 
 ##
 ##";
-const TO_DROP: u16 = 2022;
 const WELL_WIDTH: u8 = 7;
 const START_MARGIN_X: u8 = 2;
 const START_MARGIN_Y: u16 = 3;
 
-#[derive(Debug)]
 struct Rock {
     data: Box<[(u8, u16)]>,
     w: u8,
@@ -56,31 +54,75 @@ fn rocks() -> Box<[Rock]> {
         .into_boxed_slice()
 }
 
-fn play<'a, R, J>(rocks: R, jets: J) -> u16
-where
-    R: Iterator<Item = &'a Rock> + Clone,
-    J: Iterator<Item = char> + Clone,
-{
-    let mut well = Well::new();
-    let mut rocks = rocks.cycle();
-    let mut jets = jets.cycle();
-    let mut height = 0u16;
-    for i in 0..TO_DROP {
-        let rock = rocks.next().unwrap();
-        let y = height + START_MARGIN_Y;
-        let drop_loc = drop(rock, &well, y, &mut jets);
-        height = std::cmp::max(height, drop_loc.1 + rock.h);
-        place_rock(&mut well, rock, drop_loc);
-    }
-    height
+enum CycleDetect {
+    Searching(HashMap<(u8, usize, usize), (u16, u16)>),
+    FindRemainder {
+        cycs: u64,
+        height_before_cycle: u16,
+        cycle_height: u16,
+        target_block: u16,
+    },
 }
 
-fn drop<J>(rock: &Rock, well: &Well, mut y: u16, jets: &mut J) -> (u8, u16)
-where
-    J: Iterator<Item = char> + Clone,
-{
+fn play(target: u64, rocks: &[Rock], jets: &[char]) -> u64 {
+    let mut well = Well::new();
+    let mut rock_i = 0;
+    let mut jets_i = 0;
+    let mut height = 0u16;
+    let mut cycle_detect = CycleDetect::Searching(HashMap::new());
+    let mut i = 0u16;
+    loop {
+        let rock = &rocks[rock_i];
+        let y = height + START_MARGIN_Y;
+        let drop_loc = drop(rock, &well, y, jets, &mut jets_i);
+        height = std::cmp::max(height, drop_loc.1 + rock.h);
+        place_rock(&mut well, rock, drop_loc);
+        rock_i = (rock_i + 1) % rocks.len();
+        i += 1;
+
+        cycle_detect = if let CycleDetect::Searching(mut map) = cycle_detect {
+            let state = (*well.last().unwrap(), rock_i, jets_i);
+            match map.insert(state, (i, height)) {
+                Some((cycle_begin, height_before_cycle)) => {
+                    let cycle_len = i - cycle_begin;
+                    let cycle_height = height - height_before_cycle;
+                    let cycs = (target - cycle_begin as u64) / cycle_len as u64;
+                    let remainder = (target - cycle_begin as u64) % cycle_len as u64;
+                    let target_block = i + (remainder as u16);
+                    CycleDetect::FindRemainder {
+                        cycs,
+                        height_before_cycle,
+                        cycle_height,
+                        target_block,
+                    }
+                }
+                None => CycleDetect::Searching(map),
+            }
+        } else {
+            cycle_detect
+        };
+        if let CycleDetect::FindRemainder {
+            height_before_cycle,
+            cycle_height,
+            cycs,
+            target_block,
+        } = cycle_detect
+        {
+            if i == target_block {
+                let remainder_height = (height - cycle_height - height_before_cycle) as u64;
+                return height_before_cycle as u64
+                    + cycs * cycle_height as u64
+                    + remainder_height as u64;
+            }
+        }
+    }
+}
+
+fn drop(rock: &Rock, well: &Well, mut y: u16, jets: &[char], jets_i: &mut usize) -> (u8, u16) {
     let mut x = START_MARGIN_X;
-    for jet in jets {
+    loop {
+        let jet = jets[*jets_i % jets.len()];
+        *jets_i = (*jets_i + 1) % jets.len();
         match jet {
             '<' if x == 0 => {}
             '>' if x + rock.w >= WELL_WIDTH => {}
@@ -94,12 +136,11 @@ where
             }
             _ => {}
         }
-        if (y == 0) || (y+1 < rock.h) || overlap(rock, x, y - 1, well) {
+        if (y == 0) || (y + 1 < rock.h) || overlap(rock, x, y - 1, well) {
             return (x, y);
         }
         y -= 1;
     }
-    unreachable!();
 }
 
 fn place_rock(well: &mut Well, rock: &Rock, loc: (u8, u16)) {
@@ -124,29 +165,9 @@ fn overlap(rock: &Rock, ox: u8, oy: u16, well: &Well) -> bool {
     false
 }
 
-fn debug_draw(well: &Well) {
-    println!();
-    for y in (0..well.len()).rev() {
-        print!("|");
-        for x in 0..7 {
-            match well[y] & (0x1 << x) {
-                0 => print!(".."),
-                _ => print!("[]")
-            }
-        }
-        println!("|");
-    }
-    println!("+--------------+\n");
-}
-
 pub fn main() {
-    let input = puzzle_input!();
+    let jets = puzzle_input!().chars().collect_vec();
     let rocks = rocks();
-    let jets = if false {
-        EXAMPLE.chars()
-    } else {
-        input.chars()
-    };
-    let p1 = play(rocks.iter(), jets);
-    println!("part 1: {}", p1);
+    println!("part 1: {}", play(2022, &rocks, &jets));
+    println!("part 2: {}", play(1000000000000u64, &rocks, &jets));
 }
