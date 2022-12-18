@@ -29,9 +29,11 @@ defmodule Day14 do
 
   def debug_draw(m) do
     {{_, lowbound}, _} = Enum.max(m, fn {{_, y1}, _}, {{_, y2}, _} -> y1 >= y2 end)
+
     {leftbound, rightbound} =
       Enum.map(Map.keys(m), fn {x, _} -> x end)
       |> Enum.min_max()
+
     for y <- 0..lowbound do
       for x <- leftbound..rightbound do
         case Map.get(m, {x, y}) do
