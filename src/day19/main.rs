@@ -1,12 +1,14 @@
-use std::collections::BTreeMap;
+#![allow(soft_unstable)]
+use std::collections::VecDeque;
 
 use itertools::{izip, Itertools};
 use regex::Regex;
 use shared::puzzle_input;
 
+const ALLOW_ALL: [bool; 4] = [true, true, true, true];
+
 #[derive(Debug)]
 struct Blueprint {
-    id: u8,
     costs: [[u8; 3]; 4],
 }
 
@@ -36,14 +38,17 @@ fn gather(mut resources: Counts, bots: &Counts) -> Counts {
     resources
 }
 
-fn play(bp: &Blueprint) -> u8 {
-    let mut stack = vec![(
+fn play(bp: &Blueprint, minutes: u8) -> u8 {
+    // PRUNING - changed from DFS to BFS so that we can check when things are falling behind with just 1 number
+    let mut queue = VecDeque::<_>::new();
+    queue.push_back((
         State {
             bot_counts: [1, 0, 0, 0],
             resources: Counts::default(),
         },
-        0,
-    )];
+        ALLOW_ALL,
+        1u8,
+    ));
     let caps = izip!(
         bp.costs[0].iter(),
         bp.costs[1].iter(),
@@ -53,85 +58,84 @@ fn play(bp: &Blueprint) -> u8 {
     .map(|(a, b, c, d)| *[a, b, c, d].iter().max().unwrap())
     .collect_vec();
     let mut best = 0;
-    // todo: prune based on recorded best geonde counts for time, bots, and resource amounts
-    let mut best_states = BTreeMap::<(u8, [u8;3], [u8;4]), u8>::new();
-    while let Some((state, time)) = stack.pop() {
-        //if (state.resources[3] > best) || bp.id == 1 {
-        //    eprintln!(
-        //        "BP {} MINUTE {} bots {:?} resources {:?}",
-        //        bp.id, time, state.bot_counts, state.resources
-        //    );
-        //}
-        best = std::cmp::max(best, state.resources[3]);
+    'next: while let Some((state, allow, time)) = queue.pop_front() {
+        best = best.max(state.resources[3]);
 
-        let time = time + 1;
-        if time > 24 {
+        if time > minutes {
             continue;
         }
 
-        // prune!
-        // todo: prune based on upper bound vs best so far
-        let skip_build = if time > 21 && state.bot_counts[1] == 0 {
-            true
-        } else if time > 22 && state.bot_counts[2] == 0 {
-            true
-        } else if time > 23 && state.bot_counts[3] == 0 {
-            true
-        } else {
-            false
-        };
+        // PRUNING - falling behind the rest of the BFS
+        if state.resources[3] + state.bot_counts[3] + 1 < best {
+            continue;
+        }
 
-        if !skip_build {
-            for bot_type in (0..4).rev() {
-                let full = (bot_type != 3) && (state.bot_counts[bot_type] >= *caps[bot_type]);
-                if !full && can_afford(&bp.costs[bot_type], &state.resources) {
-                    let resources = spend(state.resources, &bp.costs[bot_type]);
-                    let resources = gather(resources, &state.bot_counts);
-                    let mut bot_counts = state.bot_counts;
-                    bot_counts[bot_type] += 1;
-                    stack.push((
-                        State {
-                            bot_counts,
-                            resources,
-                        },
-                        time,
-                    ));
+        // PRUNING - if we skipped building something we could, no point in considering building it next time
+        let allow_after_skip = [0, 1, 2, 3].map(|i| !can_afford(&bp.costs[i], &state.resources));
+
+        for bot_type in (0..4).rev() {
+            let full = (bot_type != 3) && (state.bot_counts[bot_type] >= *caps[bot_type]);
+            if !full && allow[bot_type] && !allow_after_skip[bot_type] {
+                let resources = spend(state.resources, &bp.costs[bot_type]);
+                let resources = gather(resources, &state.bot_counts);
+                let mut bot_counts = state.bot_counts;
+                bot_counts[bot_type] += 1;
+                queue.push_back((
+                    State {
+                        bot_counts,
+                        resources,
+                    },
+                    ALLOW_ALL,
+                    time + 1,
+                ));
+                // PRUNING - if we built a geode bot, don't consider other bots or skipping
+                if bot_type == 3 {
+                    continue 'next;
                 }
             }
         }
 
-        if !state.resources.iter().zip(caps.iter()).all(|(r, c)| r >= c) {
-            let resources = gather(state.resources, &state.bot_counts);
-            stack.push((State { resources, ..state }, time));
-        }
+        let resources = gather(state.resources, &state.bot_counts);
+        queue.push_back((State { resources, ..state }, allow_after_skip, time + 1));
     }
-    eprintln!("{} {}", bp.id, best);
     best
 }
 
 pub fn main() {
-    let sep = Regex::new(r"[^0-9]+").unwrap();
-    let input = puzzle_input!();
-    let bps = input
-        .split('\n')
-        .map(|line| {
-            let v = sep
-                .split(line)
-                .filter(|s| !s.is_empty())
-                .map(|s| s.parse::<u8>().unwrap())
-                .collect_vec();
-            Blueprint {
-                id: v[0],
-                costs: [[v[1], 0, 0], [v[2], 0, 0], [v[3], v[4], 0], [v[5], 0, v[6]]],
-            }
-        })
-        .collect_vec();
-    let p1 = bps
-        .iter()
-        .map(|bp| play(&bp) as u16 * bp.id as u16)
-        .sum::<u16>();
-    let p2 = 0;
+    use std::time::Instant;
+    let now = Instant::now();
+    let (p1, p2) = {
+        let sep = Regex::new(r"[^0-9]+").unwrap();
+        let input = puzzle_input!();
+        let bps = input
+            .split('\n')
+            .map(|line| {
+                let v = sep
+                    .split(line)
+                    .filter(|s| !s.is_empty())
+                    .map(|s| s.parse::<u8>().unwrap())
+                    .collect_vec();
+                Blueprint {
+                    costs: [[v[1], 0, 0], [v[2], 0, 0], [v[3], v[4], 0], [v[5], 0, v[6]]],
+                }
+            })
+            .collect_vec();
+        let p1 = bps
+            .iter()
+            .map(|bp| play(bp, 24) as usize)
+            .enumerate()
+            .map(|(i, v)| (i + 1) * v)
+            .sum::<usize>();
+        let p2 = bps
+            .iter()
+            .take(3)
+            .map(|bp| play(bp, 32) as usize)
+            .product::<usize>();
+        (p1, p2)
+    };
+    let elapsed = now.elapsed();
+    eprintln!("Elapsed: {:.2?}", elapsed);
 
-    // 1395,
+    // 1395, 2700
     println!("part 1: {}\npart 2: {}", p1, p2);
 }
