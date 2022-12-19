@@ -1,3 +1,5 @@
+use std::collections::BTreeMap;
+
 use itertools::{izip, Itertools};
 use regex::Regex;
 use shared::puzzle_input;
@@ -50,58 +52,60 @@ fn play(bp: &Blueprint) -> u8 {
     )
     .map(|(a, b, c, d)| *[a, b, c, d].iter().max().unwrap())
     .collect_vec();
-    if bp.id == 1 {
-        eprintln!("{:?}", bp);
-        eprintln!("{:?}", caps);
-    }
     let mut best = 0;
-    let mut geo_bot_counts= vec![0;25];
+    // todo: prune based on recorded best geonde counts for time, bots, and resource amounts
+    let mut best_states = BTreeMap::<(u8, [u8;3], [u8;4]), u8>::new();
     while let Some((state, time)) = stack.pop() {
-        if (state.resources[3] > best) || bp.id == 1 {
-            eprintln!(
-                "BP {} MINUTE {} bots {:?} resources {:?}",
-                bp.id, time, state.bot_counts, state.resources
-            );
-        }
+        //if (state.resources[3] > best) || bp.id == 1 {
+        //    eprintln!(
+        //        "BP {} MINUTE {} bots {:?} resources {:?}",
+        //        bp.id, time, state.bot_counts, state.resources
+        //    );
+        //}
         best = std::cmp::max(best, state.resources[3]);
-
-        let geo_bot_count = state.bot_counts[3];
-        if geo_bot_count > geo_bot_counts[time as usize] {
-            geo_bot_counts[time as usize] = geo_bot_count;
-        } else if geo_bot_count < geo_bot_counts[time as usize] {
-            continue;
-        }
 
         let time = time + 1;
         if time > 24 {
             continue;
         }
 
-        for bot_type in (0..4).rev() {
-            if bp.id == 1 && time == 11 && bot_type == 2{
-                eprintln!("11 {:?} {:?} {}", bp.costs[bot_type], state.resources, can_afford(&bp.costs[bot_type], &state.resources));
-            }
-            let full = (bot_type != 3) && (state.bot_counts[bot_type] >= *caps[bot_type]);
-            if !full && can_afford(&bp.costs[bot_type], &state.resources) {
-                let resources = spend(state.resources, &bp.costs[bot_type]);
-                let resources = gather(resources, &state.bot_counts);
-                let mut bot_counts = state.bot_counts;
-                bot_counts[bot_type] += 1;
-                stack.push((
-                    State {
-                        bot_counts,
-                        resources,
-                    },
-                    time,
-                ));
+        // prune!
+        // todo: prune based on upper bound vs best so far
+        let skip_build = if time > 21 && state.bot_counts[1] == 0 {
+            true
+        } else if time > 22 && state.bot_counts[2] == 0 {
+            true
+        } else if time > 23 && state.bot_counts[3] == 0 {
+            true
+        } else {
+            false
+        };
+
+        if !skip_build {
+            for bot_type in (0..4).rev() {
+                let full = (bot_type != 3) && (state.bot_counts[bot_type] >= *caps[bot_type]);
+                if !full && can_afford(&bp.costs[bot_type], &state.resources) {
+                    let resources = spend(state.resources, &bp.costs[bot_type]);
+                    let resources = gather(resources, &state.bot_counts);
+                    let mut bot_counts = state.bot_counts;
+                    bot_counts[bot_type] += 1;
+                    stack.push((
+                        State {
+                            bot_counts,
+                            resources,
+                        },
+                        time,
+                    ));
+                }
             }
         }
 
-        if !state.resources.iter().zip(caps.iter()).all(|(r,c)|r>=c) {
+        if !state.resources.iter().zip(caps.iter()).all(|(r, c)| r >= c) {
             let resources = gather(state.resources, &state.bot_counts);
             stack.push((State { resources, ..state }, time));
         }
     }
+    eprintln!("{} {}", bp.id, best);
     best
 }
 
@@ -125,9 +129,9 @@ pub fn main() {
     let p1 = bps
         .iter()
         .map(|bp| play(&bp) as u16 * bp.id as u16)
-        .max()
-        .unwrap();
+        .sum::<u16>();
     let p2 = 0;
 
+    // 1395,
     println!("part 1: {}\npart 2: {}", p1, p2);
 }
