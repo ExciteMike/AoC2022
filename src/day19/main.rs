@@ -7,10 +7,7 @@ use shared::puzzle_input;
 
 const ALLOW_ALL: [bool; 4] = [true, true, true, true];
 
-#[derive(Debug)]
-struct Blueprint {
-    costs: [[u8; 3]; 4],
-}
+type Blueprint = [[u8; 3]; 4];
 
 type Counts = [u8; 4];
 
@@ -49,14 +46,9 @@ fn play(bp: &Blueprint, minutes: u8) -> u8 {
         ALLOW_ALL,
         1u8,
     ));
-    let caps = izip!(
-        bp.costs[0].iter(),
-        bp.costs[1].iter(),
-        bp.costs[2].iter(),
-        bp.costs[3].iter()
-    )
-    .map(|(a, b, c, d)| *[a, b, c, d].iter().max().unwrap())
-    .collect_vec();
+    let caps = izip!(bp[0].iter(), bp[1].iter(), bp[2].iter(), bp[3].iter())
+        .map(|(a, b, c, d)| *[a, b, c, d].iter().max().unwrap())
+        .collect_vec();
     let mut best = 0;
     'next: while let Some((state, allow, time)) = queue.pop_front() {
         best = best.max(state.resources[3]);
@@ -71,12 +63,12 @@ fn play(bp: &Blueprint, minutes: u8) -> u8 {
         }
 
         // PRUNING - if we skipped building something we could, no point in considering building it next time
-        let allow_after_skip = [0, 1, 2, 3].map(|i| !can_afford(&bp.costs[i], &state.resources));
+        let allow_after_skip = [0, 1, 2, 3].map(|i| !can_afford(&bp[i], &state.resources));
 
         for bot_type in (0..4).rev() {
             let full = (bot_type != 3) && (state.bot_counts[bot_type] >= *caps[bot_type]);
             if !full && allow[bot_type] && !allow_after_skip[bot_type] {
-                let resources = spend(state.resources, &bp.costs[bot_type]);
+                let resources = spend(state.resources, &bp[bot_type]);
                 let resources = gather(resources, &state.bot_counts);
                 let mut bot_counts = state.bot_counts;
                 bot_counts[bot_type] += 1;
@@ -115,9 +107,7 @@ pub fn main() {
                     .filter(|s| !s.is_empty())
                     .map(|s| s.parse::<u8>().unwrap())
                     .collect_vec();
-                Blueprint {
-                    costs: [[v[1], 0, 0], [v[2], 0, 0], [v[3], v[4], 0], [v[5], 0, v[6]]],
-                }
+                [[v[1], 0, 0], [v[2], 0, 0], [v[3], v[4], 0], [v[5], 0, v[6]]]
             })
             .collect_vec();
         let p1 = bps
