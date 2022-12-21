@@ -11,7 +11,8 @@ defmodule Aoc2022.MixProject do
 
   defp deps do
     [
-      {:credo, "~> 1.6", only: [:dev, :test], runtime: false}
+      {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
+      {:elixir_ds, "~> 0.1.0"}
     ]
   end
 end
