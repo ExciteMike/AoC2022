@@ -1,9 +1,3 @@
-#![allow(unused_imports)]
-use std::{
-    collections::{BTreeMap, HashSet},
-    ops::Add,
-};
-
 use itertools::Itertools;
 use shared::puzzle_input;
 
