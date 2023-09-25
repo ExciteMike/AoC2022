@@ -34,12 +34,12 @@ macro_rules! map_words {
 #[macro_export]
 macro_rules! puzzle_input {
     () => {{
-        const year: i32 = 2022;
+        const YEAR: i32 = 2022;
         let mod_name = module_path!().rsplit("::").next().unwrap();
         let day_num = (&mod_name[3..5])
             .parse::<u32>()
             .expect(&format!("something went wrong parsing \"{}\"", mod_name));
-        let x = shared::puzzle_input(year, day_num).replace("\r\n", "\n");
+        let x = shared::puzzle_input(YEAR, day_num).replace("\r\n", "\n");
         x.trim_end().to_string()
     }};
 }
